@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediNav</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .panel {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to right, #ffb6c1, #ff69b4);
+      transition: all 0.4s ease-in-out;
+    }
+
+    .form-box {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 0px 50px 40px 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      width: 350px;
+      transition: transform 0.4s ease-in-out;
+    }
+
+    .form-box h2 {
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    label {
+      color: white;
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #fff0f5;
+      font-size: 14px;
+      outline: none;
+      transition: background-color 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      background-color: #ffe4ec;
+    }
+
+    button {
+      display: block;
+      margin-top: 15px;
+      background: linear-gradient(to bottom, #ff8fcf, #ff5eaa);
+      border: none;
+      color: white;
+      font-weight: bold;
+      padding: 15px 152px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 0 #ff75b5, 0 6px 12px rgba(255, 105, 180, 0.3);
+      transform: translateY(0);
+    }
+
+    button:hover {
+      cursor: pointer;
+      background: linear-gradient(to bottom, #ff6db4, #ff3f9d);
+    }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #ff4da1, 0 4px 8px rgba(255, 62, 138, 0.2);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .hospital-info {
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 500px;
+      text-align: center;
+      color: white;
+      backdrop-filter: blur(10px);
+    }
+
+    .hospital-info h3 {
+      color: #fff;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .top-bar button {
+      width: auto;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .centered-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mediNav, .medNavi {
+      font-size: 52px;
+      color: white;
+      font-weight: bold;
+      margin-top: -20px;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow:
+        -1px -1px 0 #c446b5,
+        1px -1px 0 #da6cb2,
+        -1px  1px 0 #da65a7,
+        1px  1px 0 #e073e8;
+    }
+
+    .side-by-side {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 30px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel" id="inputPanel">
+    <div class="centered-container">
+      <p class="mediNav">MediNav</p>
+      <div class="form-box">
+        <h2>Enter Your Information</h2>
+        <label for="name">Name</label>
+        <input type="text" id="name" placeholder="Your Name" />
+
+        <label for="age">Age</label>
+        <input type="number" id="age" placeholder="Your Age" min="0" />
+
+        <label for="sex">Sex</label>
+        <input type="text" id="sex" placeholder="Male / Female / Other" />
+
+        <label for="location">Location</label>
+        <input type="text" id="location" placeholder="Your Location" />
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" placeholder="09xxxxxxxxx" pattern="[0-9]{11}" maxlength="11"/>
+
+        <button onclick="submitForm()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel hidden" id="hospitalPanel">
+    <div class="top-bar">
+      <button onclick="goBack()">← Back</button>
+    </div>
+    <div class="centered-container">
+      <p class="mediNav">MediNav</p>
+      <div class="side-by-side">
+        <div class="form-box">
+          <h2>Select a Hospital</h2>
+          <label for="hospitalDropdown">Nearby Hospitals</label>
+          <select id="hospitalDropdown">
+            <option value="taytay">Taytay Doctors Multispecialty Hospital (4.2 km)</option>
+            <option value="rizal">Rizal Provincial Hospital System Taytay (1.1 km)</option>
+          </select>
+          <button onclick="showHospitalInfo()">Confirm Selection</button>
+        </div>
+        <div class="hospital-info hidden" id="hospitalInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function submitForm() {
+      const name = document.getElementById("name").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const sex = document.getElementById("sex").value.trim();
+      const location = document.getElementById("location").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!name || !age || !sex || !location || !phone) {
+        alert("Please fill in all fields!");
+        return;
+      }
+
+      document.getElementById("inputPanel").classList.add("hidden");
+      document.getElementById("hospitalPanel").classList.remove("hidden");
+    }
+
+    function goBack() {
+      document.getElementById("inputPanel").classList.remove("hidden");
+      document.getElementById("hospitalPanel").classList.add("hidden");
+      document.getElementById("hospitalInfo").classList.add("hidden");
+      document.getElementById("hospitalInfo").innerHTML = "";
+
+      document.getElementById("name").value = "";
+      document.getElementById("age").value = "";
+      document.getElementById("sex").value = "";
+      document.getElementById("location").value = "";
+      document.getElementById("phone").value = "";
+
+      document.getElementById("hospitalDropdown").selectedIndex = 0;
+    }
+
+    function showHospitalInfo() {
+      const selection = document.getElementById("hospitalDropdown").value;
+      const infoDiv = document.getElementById("hospitalInfo");
+      let info = "";
+
+      if (selection === "taytay") {
+        info = `
+          <h3>Taytay Doctors Multispecialty Hospital</h3>
+          <ul style="text-align:left;">
+            <li><strong>Classification:</strong> Secondary</li>
+            <li><strong>Bed Capacity:</strong> 25</li>
+            <li><strong>Rooms Available:</strong> 11</li>
+            <li><strong>Equipment:</strong> CT scan, X-ray, Ultrasound, ECG, Dialysis Machine</li>
+            <li><strong>Services:</strong> 24/7 Pharmacy, Emergency Room, Operating Room, NICU, Hemodialysis, Telemedicine</li>
+          </ul>
+        `;
+      } else {
+        info = `
+          <h3>Rizal Provincial Hospital System Taytay</h3>
+          <ul style="text-align:left;">
+            <li><strong>Classification:</strong> Primary</li>
+            <li><strong>Bed Capacity:</strong> 11</li>
+            <li><strong>Rooms Available:</strong> 5</li>
+            <li><strong>Equipment:</strong> MRI, CT scan, Digital X-ray, Laboratory Analyzers</li>
+            <li><strong>Services:</strong> Surgery, Obstetrics-Gynecology, Internal Medicine, Pediatrics, Dental, Hemodialysis</li>
+          </ul>
+        `;
+      }
+
+      infoDiv.innerHTML = info;
+      infoDiv.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
